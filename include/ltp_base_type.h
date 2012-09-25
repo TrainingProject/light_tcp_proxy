@@ -11,10 +11,11 @@
  *       Compiler:  gcc
  *
  *         Author:  Feng Gao
- *        Company:  
+ *          Email:  gfree.wind@gmail.com
  *
  * =====================================================================================
  */
+
 #ifndef LTP_BASE_TYPE_H_
 #define LTP_BASE_TYPE_H_
 
