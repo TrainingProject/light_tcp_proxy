@@ -1,0 +1,15 @@
+#
+#   Light TCP Proxy
+#
+#   As its name, it is a light TCP proxy.
+#   It is used to the network device.
+#   Now it is based on the IPtables. 
+#   But it will be could be ported into kernel easily
+#
+#
+#   Author: Feng Gao
+#   Email : gfree.wind@gmail.com
+#   Date  : 9/25/2012
+
+
+
