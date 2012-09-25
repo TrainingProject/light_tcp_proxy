@@ -12,12 +12,14 @@
  *       Compiler:  gcc
  *
  *         Author:  Feng Gao
- *        Company:  
+ *          Email:  gfree.wind@gmail.com
  *
  * =====================================================================================
  */
 
-int main()
+int main(int argc, const char ** argv)
 {
+	
+
     return 0;
 }

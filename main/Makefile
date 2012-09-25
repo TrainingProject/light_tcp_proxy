@@ -7,7 +7,7 @@ TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.def
 
-CFLAGS  += -I/$(prefix)/include
+CFLAGS  +=
 LFLAGS  +=
 
 BIN_TARGET := ltp_main
