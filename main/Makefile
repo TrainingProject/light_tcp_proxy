@@ -8,7 +8,7 @@ TOP_DIR := ..
 include $(TOP_DIR)/Makefile.def
 
 CFLAGS  +=
-LFLAGS  +=
+LFLAGS  += -lipq
 
 BIN_TARGET := ltp_main
 OBJS       := ltp_main.o 

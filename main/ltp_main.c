@@ -18,12 +18,14 @@
  */
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <signal.h>
 #include <linux/in.h>
+#include <linux/in6.h>
 #include <linux/netfilter.h>
 #include <libipq.h>
 
 #include "ltp_debug.h"
-
+#include "ltp_errno.h"
 
 /***************************************************************************************/
 static bool g_ltp_daemon_exit = FALSE;
@@ -59,9 +61,9 @@ int main(int argc, const char ** argv)
         ret = ipq_message_type(buf);
         if (likely(IPQM_PACKET == ret)) {
             LTP_DEBUG_LOG("Get one packet\n");
-            pq_packet_msg_t *pkt = ipq_get_packet(buff)
+            ipq_packet_msg_t *pkt = ipq_get_packet(buf);
             if (likely(pkt)) {
-                ret = ipq_set_verdict(h, m->packet_id, NF_ACCEPT, 0, NULL);
+                ret = ipq_set_verdict(h, pkt->packet_id, NF_ACCEPT, 0, NULL);
                 if (-1 == ret) {
                     LTP_ERROR_LOG("ipq_set_verdict failed\n");
                     goto error2;
@@ -74,7 +76,7 @@ int main(int argc, const char ** argv)
             }
         }
         else if (NLMSG_ERROR == ret) {
-            LTP_ERROR_LOG("Recevie error msg(%s)\n", ipq_get_msgerr(buf));
+            LTP_ERROR_LOG("Recevie error msg(%d)\n", ipq_get_msgerr(buf));
             goto error2;
         }
         else {
