@@ -5,7 +5,7 @@
 #
 #
 
-.PHONY: all install clean
+.PHONY: all install clean 3rd
 
 include Makefile.def
 
@@ -27,3 +27,5 @@ clean:
 	@cd lib && rm -f *
 
 3rd:
+	@cd 3rd && tar -jxf iptables-1.4.16.2.tar.bz2
+	@cd 3rd/iptables-1.4.16.2 && ./configure --enable-libipq && make && make install
