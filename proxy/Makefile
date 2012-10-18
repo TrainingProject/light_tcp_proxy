@@ -8,10 +8,10 @@ TOP_DIR := ..
 include $(TOP_DIR)/Makefile.def
 
 CFLAGS  +=
-LFLAGS  += -lipq -lltpproxy
+LFLAGS  += -shared -fPIC
 
-BIN_TARGET := ltp_main
-OBJS       := ltp_main.o 
+LIB_TARGET := libltpproxy.so
+OBJS       := ltp_ip.o 
 
 
 ifeq ($(plat), linux)

@@ -27,6 +27,7 @@
 #include "ltp_debug.h"
 #include "ltp_errno.h"
 
+#include "ltp_ip.h"
 /***************************************************************************************/
 static bool g_ltp_daemon_exit = FALSE;
 /***************************************************************************************/
@@ -63,6 +64,8 @@ int main(int argc, const char ** argv)
             LTP_DEBUG_LOG("Get one packet\n");
             ipq_packet_msg_t *pkt = ipq_get_packet(buf);
             if (likely(pkt)) {
+                ret = ltp_ip_handler((struct iphdr *)pkt->payload);
+            
                 ret = ipq_set_verdict(h, pkt->packet_id, NF_ACCEPT, 0, NULL);
                 if (-1 == ret) {
                     LTP_ERROR_LOG("ipq_set_verdict failed\n");

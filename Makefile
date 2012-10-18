@@ -16,12 +16,15 @@ endif
 all:
 	@echo "plat=$(plat)" > Makefile.def
 	@echo "prefix=$(prefix)" >> Makefile.def
+	@cd proxy && $(MAKE)
 	@cd main && $(MAKE)
 
 install:
+	@cd proxy && $(MAKE) install
 	@cd main && $(MAKE) install
 
 clean:
+	@cd proxy && $(MAKE) clean
 	@cd main && $(MAKE) clean
 	@cd bin && rm -f *
 	@cd lib && rm -f *

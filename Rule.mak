@@ -12,7 +12,7 @@ LTP_COMM_INC_FILES    := $(wildcard $(TOP_DIR)/include/*.h)
 
 CC      := gcc
 CFLAGS  += -Wall -Werror -fPIC -I$(LTP_COMM_INC) -I$(LTP_3RD_INC)
-LFALGS  += -L$(LTP_LIB_DIR)
+LFLAGS  += -L$(LTP_LIB_DIR)
 
 ifeq ($(plat), )
 $(error "make {plat=linux|...|}")
@@ -35,7 +35,7 @@ endif
 # Build dynamic libarary
 ifdef LIB_TARGET
 $(LIB_TARGET): $(OBJS)
-	$(CC) $(LFLAGS) $(OBJS) -o $(LIB_TARGET)
+	$(CC) $(CFLAGS) $(LFLAGS) $(OBJS) -o $(LIB_TARGET)
 	@cp -f $(LIB_TARGET) $(LTP_LIB_DIR)/
 
 install:
@@ -45,8 +45,8 @@ endif
 # Buid executable bin
 ifdef BIN_TARGET
 $(BIN_TARGET): $(OBJS)
-	$(CC) $(LFLAGS) $(OBJS) -o $(BIN_TARGET)
-	@cp -f $(BIN_TARGET) $(LTP_BIN_DIR)
+	$(CC) $(CFLAGS) $(LFLAGS) $(OBJS) -o $(BIN_TARGET)
+	@cp -f $(BIN_TARGET) $(LTP_BIN_DIR)/
 
 install:
 	@cp -f $(BIN_TARGET) $(prefix)/bin/
