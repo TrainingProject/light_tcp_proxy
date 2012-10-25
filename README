@@ -2,6 +2,18 @@
 #   Light TCP Proxy
 #
 #   As its name, it is a light TCP proxy.
+#
+#   Now it is incomplete. But it is used to study Linux TCP/IP codes.
+#   Because you could debug the codes in the user space.
+#   There are lots of codes from linux kernel
+#
+#   Usage:
+#   1. Add one rule into itpable like the following rule
+#      iptables -t mangle -I PREROUTING -p tcp -s 192.168.1.104 -d 192.168.1.105 --dport 8080 -j QUEUE
+#   2. Run ./ltp_main
+#
+#   Future Usage:
+#
 #   It is used to the network device, so it does not depending on any libarary even libc
 #   Now it is based on the IPtables to get the packet from kernel.
 #   It is easy to debug in this way.

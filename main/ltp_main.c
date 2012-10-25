@@ -66,7 +66,7 @@ int main(int argc, const char ** argv)
             if (likely(pkt)) {
                 ret = ltp_ip_handler((struct iphdr *)pkt->payload);
             
-                ret = ipq_set_verdict(h, pkt->packet_id, NF_ACCEPT, 0, NULL);
+                ret = ipq_set_verdict(h, pkt->packet_id, NF_ACCEPT, pkt->data_len, pkt->payload);
                 if (-1 == ret) {
                     LTP_ERROR_LOG("ipq_set_verdict failed\n");
                     goto error2;

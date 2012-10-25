@@ -8,7 +8,7 @@ TOP_DIR := ..
 include $(TOP_DIR)/Makefile.def
 
 CFLAGS  +=
-LFLAGS  += -shared -fPIC
+LFLAGS  += -shared -fPIC -nostdinc
 
 LIB_TARGET := libltpproxy.so
 OBJS       := ltp_ip.o 
