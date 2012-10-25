@@ -23,7 +23,7 @@
 enum {
     LTP_OK,
     LTP_ERR,
-    
+    LTP_NOMEM,
 };
 
 

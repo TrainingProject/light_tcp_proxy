@@ -19,6 +19,9 @@
 #include <asm/bug.h>
 #include <asm/atomic.h>
 
+
+#include "ltp_errno.h"
+
 /* Don't change this without changing skb_csum_unnecessary! */
 #define CHECKSUM_NONE 0
 #define CHECKSUM_UNNECESSARY 1
@@ -1327,229 +1330,6 @@ static inline void __skb_queue_purge(struct sk_buff_head *list)
 		kfree_skb(skb);
 }
 
-/**
- *	__dev_alloc_skb - allocate an skbuff for receiving
- *	@length: length to allocate
- *	@gfp_mask: get_free_pages mask, passed to alloc_skb
- *
- *	Allocate a new &sk_buff and assign it a usage count of one. The
- *	buffer has unspecified headroom built in. Users should allocate
- *	the headroom they think they need without accounting for the
- *	built in space. The built in space is used for optimisations.
- *
- *	%NULL is returned if there is no free memory.
- */
-static inline struct sk_buff *__dev_alloc_skb(unsigned int length,
-					      gfp_t gfp_mask)
-{
-	struct sk_buff *skb = alloc_skb(length + NET_SKB_PAD, gfp_mask);
-	if (likely(skb))
-		skb_reserve(skb, NET_SKB_PAD);
-	return skb;
-}
-
-extern struct sk_buff *dev_alloc_skb(unsigned int length);
-
-extern struct sk_buff *__netdev_alloc_skb(struct net_device *dev,
-		unsigned int length, gfp_t gfp_mask);
-
-/**
- *	netdev_alloc_skb - allocate an skbuff for rx on a specific device
- *	@dev: network device to receive on
- *	@length: length to allocate
- *
- *	Allocate a new &sk_buff and assign it a usage count of one. The
- *	buffer has unspecified headroom built in. Users should allocate
- *	the headroom they think they need without accounting for the
- *	built in space. The built in space is used for optimisations.
- *
- *	%NULL is returned if there is no free memory. Although this function
- *	allocates memory it can be called from an interrupt.
- */
-static inline struct sk_buff *netdev_alloc_skb(struct net_device *dev,
-		unsigned int length)
-{
-	return __netdev_alloc_skb(dev, length, GFP_ATOMIC);
-}
-
-static inline struct sk_buff *__netdev_alloc_skb_ip_align(struct net_device *dev,
-		unsigned int length, gfp_t gfp)
-{
-	struct sk_buff *skb = __netdev_alloc_skb(dev, length + NET_IP_ALIGN, gfp);
-
-	if (NET_IP_ALIGN && skb)
-		skb_reserve(skb, NET_IP_ALIGN);
-	return skb;
-}
-
-static inline struct sk_buff *netdev_alloc_skb_ip_align(struct net_device *dev,
-		unsigned int length)
-{
-	return __netdev_alloc_skb_ip_align(dev, length, GFP_ATOMIC);
-}
-
-/**
- *	__netdev_alloc_page - allocate a page for ps-rx on a specific device
- *	@dev: network device to receive on
- *	@gfp_mask: alloc_pages_node mask
- *
- * 	Allocate a new page. dev currently unused.
- *
- * 	%NULL is returned if there is no free memory.
- */
-static inline struct page *__netdev_alloc_page(struct net_device *dev, gfp_t gfp_mask)
-{
-	return alloc_pages_node(NUMA_NO_NODE, gfp_mask, 0);
-}
-
-/**
- *	netdev_alloc_page - allocate a page for ps-rx on a specific device
- *	@dev: network device to receive on
- *
- * 	Allocate a new page. dev currently unused.
- *
- * 	%NULL is returned if there is no free memory.
- */
-static inline struct page *netdev_alloc_page(struct net_device *dev)
-{
-	return __netdev_alloc_page(dev, GFP_ATOMIC);
-}
-
-static inline void netdev_free_page(struct net_device *dev, struct page *page)
-{
-	__free_page(page);
-}
-
-/**
- * skb_frag_page - retrieve the page refered to by a paged fragment
- * @frag: the paged fragment
- *
- * Returns the &struct page associated with @frag.
- */
-static inline struct page *skb_frag_page(const skb_frag_t *frag)
-{
-	return frag->page.p;
-}
-
-/**
- * __skb_frag_ref - take an addition reference on a paged fragment.
- * @frag: the paged fragment
- *
- * Takes an additional reference on the paged fragment @frag.
- */
-static inline void __skb_frag_ref(skb_frag_t *frag)
-{
-	get_page(skb_frag_page(frag));
-}
-
-/**
- * skb_frag_ref - take an addition reference on a paged fragment of an skb.
- * @skb: the buffer
- * @f: the fragment offset.
- *
- * Takes an additional reference on the @f'th paged fragment of @skb.
- */
-static inline void skb_frag_ref(struct sk_buff *skb, int f)
-{
-	__skb_frag_ref(&skb_shinfo(skb)->frags[f]);
-}
-
-/**
- * __skb_frag_unref - release a reference on a paged fragment.
- * @frag: the paged fragment
- *
- * Releases a reference on the paged fragment @frag.
- */
-static inline void __skb_frag_unref(skb_frag_t *frag)
-{
-	put_page(skb_frag_page(frag));
-}
-
-/**
- * skb_frag_unref - release a reference on a paged fragment of an skb.
- * @skb: the buffer
- * @f: the fragment offset
- *
- * Releases a reference on the @f'th paged fragment of @skb.
- */
-static inline void skb_frag_unref(struct sk_buff *skb, int f)
-{
-	__skb_frag_unref(&skb_shinfo(skb)->frags[f]);
-}
-
-/**
- * skb_frag_address - gets the address of the data contained in a paged fragment
- * @frag: the paged fragment buffer
- *
- * Returns the address of the data within @frag. The page must already
- * be mapped.
- */
-static inline void *skb_frag_address(const skb_frag_t *frag)
-{
-	return page_address(skb_frag_page(frag)) + frag->page_offset;
-}
-
-/**
- * skb_frag_address_safe - gets the address of the data contained in a paged fragment
- * @frag: the paged fragment buffer
- *
- * Returns the address of the data within @frag. Checks that the page
- * is mapped and returns %NULL otherwise.
- */
-static inline void *skb_frag_address_safe(const skb_frag_t *frag)
-{
-	void *ptr = page_address(skb_frag_page(frag));
-	if (unlikely(!ptr))
-		return NULL;
-
-	return ptr + frag->page_offset;
-}
-
-/**
- * __skb_frag_set_page - sets the page contained in a paged fragment
- * @frag: the paged fragment
- * @page: the page to set
- *
- * Sets the fragment @frag to contain @page.
- */
-static inline void __skb_frag_set_page(skb_frag_t *frag, struct page *page)
-{
-	frag->page.p = page;
-}
-
-/**
- * skb_frag_set_page - sets the page contained in a paged fragment of an skb
- * @skb: the buffer
- * @f: the fragment offset
- * @page: the page to set
- *
- * Sets the @f'th fragment of @skb to contain @page.
- */
-static inline void skb_frag_set_page(struct sk_buff *skb, int f,
-				     struct page *page)
-{
-	__skb_frag_set_page(&skb_shinfo(skb)->frags[f], page);
-}
-
-/**
- * skb_frag_dma_map - maps a paged fragment via the DMA API
- * @dev: the device to map the fragment to
- * @frag: the paged fragment to map
- * @offset: the offset within the fragment (starting at the
- *          fragment's own offset)
- * @size: the number of bytes to map
- * @dir: the direction of the mapping (%PCI_DMA_*)
- *
- * Maps the page associated with @frag to @device.
- */
-static inline dma_addr_t skb_frag_dma_map(struct device *dev,
-					  const skb_frag_t *frag,
-					  size_t offset, size_t size,
-					  enum dma_data_direction dir)
-{
-	return dma_map_page(dev, skb_frag_page(frag),
-			    frag->page_offset + offset, size, dir);
-}
 
 /**
  *	skb_clone_writable - is the header of a clone writable
@@ -1565,108 +1345,10 @@ static inline int skb_clone_writable(const struct sk_buff *skb, unsigned int len
 	       skb_headroom(skb) + len <= skb->hdr_len;
 }
 
-static inline int __skb_cow(struct sk_buff *skb, unsigned int headroom,
-			    int cloned)
-{
-	int delta = 0;
-
-	if (headroom < NET_SKB_PAD)
-		headroom = NET_SKB_PAD;
-	if (headroom > skb_headroom(skb))
-		delta = headroom - skb_headroom(skb);
-
-	if (delta || cloned)
-		return pskb_expand_head(skb, ALIGN(delta, NET_SKB_PAD), 0,
-					GFP_ATOMIC);
-	return 0;
-}
-
-/**
- *	skb_cow - copy header of skb when it is required
- *	@skb: buffer to cow
- *	@headroom: needed headroom
- *
- *	If the skb passed lacks sufficient headroom or its data part
- *	is shared, data is reallocated. If reallocation fails, an error
- *	is returned and original skb is not changed.
- *
- *	The result is skb with writable area skb->head...skb->tail
- *	and at least @headroom of space at head.
- */
-static inline int skb_cow(struct sk_buff *skb, unsigned int headroom)
-{
-	return __skb_cow(skb, headroom, skb_cloned(skb));
-}
-
-/**
- *	skb_cow_head - skb_cow but only making the head writable
- *	@skb: buffer to cow
- *	@headroom: needed headroom
- *
- *	This function is identical to skb_cow except that we replace the
- *	skb_cloned check by skb_header_cloned.  It should be used when
- *	you only need to push on some header and do not need to modify
- *	the data.
- */
-static inline int skb_cow_head(struct sk_buff *skb, unsigned int headroom)
-{
-	return __skb_cow(skb, headroom, skb_header_cloned(skb));
-}
-
-/**
- *	skb_padto	- pad an skbuff up to a minimal size
- *	@skb: buffer to pad
- *	@len: minimal length
- *
- *	Pads up a buffer to ensure the trailing bytes exist and are
- *	blanked. If the buffer already contains sufficient data it
- *	is untouched. Otherwise it is extended. Returns zero on
- *	success. The skb is freed on error.
- */
- 
-static inline int skb_padto(struct sk_buff *skb, unsigned int len)
-{
-	unsigned int size = skb->len;
-	if (likely(size >= len))
-		return 0;
-	return skb_pad(skb, len - size);
-}
-
-static inline int skb_add_data(struct sk_buff *skb,
-			       char __user *from, int copy)
-{
-	const int off = skb->len;
-
-	if (skb->ip_summed == CHECKSUM_NONE) {
-		int err = 0;
-		__wsum csum = csum_and_copy_from_user(from, skb_put(skb, copy),
-							    copy, 0, &err);
-		if (!err) {
-			skb->csum = csum_block_add(skb->csum, csum, off);
-			return 0;
-		}
-	} else if (!copy_from_user(skb_put(skb, copy), from, copy))
-		return 0;
-
-	__skb_trim(skb, off);
-	return -EFAULT;
-}
-
-static inline int skb_can_coalesce(struct sk_buff *skb, int i,
-				   const struct page *page, int off)
-{
-	if (i) {
-		const struct skb_frag_struct *frag = &skb_shinfo(skb)->frags[i - 1];
-
-		return page == skb_frag_page(frag) &&
-		       off == frag->page_offset + skb_frag_size(frag);
-	}
-	return 0;
-}
 
 static inline int __skb_linearize(struct sk_buff *skb)
 {
-	return __pskb_pull_tail(skb, skb->data_len) ? 0 : -ENOMEM;
+	return __pskb_pull_tail(skb, skb->data_len) ? 0 : LTP_NOMEM;
 }
 
 /**
@@ -1692,24 +1374,6 @@ static inline int skb_linearize_cow(struct sk_buff *skb)
 {
 	return skb_is_nonlinear(skb) || skb_cloned(skb) ?
 	       __skb_linearize(skb) : 0;
-}
-
-/**
- *	skb_postpull_rcsum - update checksum for received skb after pull
- *	@skb: buffer to update
- *	@start: start of data before pull
- *	@len: length of data pulled
- *
- *	After doing a pull on a received packet, you need to call this to
- *	update the CHECKSUM_COMPLETE checksum, or set ip_summed to
- *	CHECKSUM_NONE so that it can be recomputed from scratch.
- */
-
-static inline void skb_postpull_rcsum(struct sk_buff *skb,
-				      const void *start, unsigned int len)
-{
-	if (skb->ip_summed == CHECKSUM_COMPLETE)
-		skb->csum = csum_sub(skb->csum, csum_partial(start, len, 0));
 }
 
 unsigned char *skb_pull_rcsum(struct sk_buff *skb, unsigned int len);
@@ -1785,142 +1449,10 @@ static inline void skb_frag_add_head(struct sk_buff *skb, struct sk_buff *frag)
 #define skb_walk_frags(skb, iter)	\
 	for (iter = skb_shinfo(skb)->frag_list; iter; iter = iter->next)
 
-extern struct sk_buff *__skb_recv_datagram(struct sock *sk, unsigned flags,
-					   int *peeked, int *err);
-extern struct sk_buff *skb_recv_datagram(struct sock *sk, unsigned flags,
-					 int noblock, int *err);
-extern unsigned int    datagram_poll(struct file *file, struct socket *sock,
-				     struct poll_table_struct *wait);
-extern int	       skb_copy_datagram_iovec(const struct sk_buff *from,
-					       int offset, struct iovec *to,
-					       int size);
-extern int	       skb_copy_and_csum_datagram_iovec(struct sk_buff *skb,
-							int hlen,
-							struct iovec *iov);
-extern int	       skb_copy_datagram_from_iovec(struct sk_buff *skb,
-						    int offset,
-						    const struct iovec *from,
-						    int from_offset,
-						    int len);
-extern int	       skb_copy_datagram_const_iovec(const struct sk_buff *from,
-						     int offset,
-						     const struct iovec *to,
-						     int to_offset,
-						     int size);
-extern void	       skb_free_datagram(struct sock *sk, struct sk_buff *skb);
-extern void	       skb_free_datagram_locked(struct sock *sk,
-						struct sk_buff *skb);
-extern int	       skb_kill_datagram(struct sock *sk, struct sk_buff *skb,
-					 unsigned int flags);
-extern __wsum	       skb_checksum(const struct sk_buff *skb, int offset,
-				    int len, __wsum csum);
-extern int	       skb_copy_bits(const struct sk_buff *skb, int offset,
-				     void *to, int len);
-extern int	       skb_store_bits(struct sk_buff *skb, int offset,
-				      const void *from, int len);
-extern __wsum	       skb_copy_and_csum_bits(const struct sk_buff *skb,
-					      int offset, u8 *to, int len,
-					      __wsum csum);
-extern int             skb_splice_bits(struct sk_buff *skb,
-						unsigned int offset,
-						struct pipe_inode_info *pipe,
-						unsigned int len,
-						unsigned int flags);
-extern void	       skb_copy_and_csum_dev(const struct sk_buff *skb, u8 *to);
-extern void	       skb_split(struct sk_buff *skb,
-				 struct sk_buff *skb1, const u32 len);
-extern int	       skb_shift(struct sk_buff *tgt, struct sk_buff *skb,
-				 int shiftlen);
 
-extern struct sk_buff *skb_segment(struct sk_buff *skb, u32 features);
-
-static inline void *skb_header_pointer(const struct sk_buff *skb, int offset,
-				       int len, void *buffer)
-{
-	int hlen = skb_headlen(skb);
-
-	if (hlen - offset >= len)
-		return skb->data + offset;
-
-	if (skb_copy_bits(skb, offset, buffer, len) < 0)
-		return NULL;
-
-	return buffer;
-}
-
-static inline void skb_copy_from_linear_data(const struct sk_buff *skb,
-					     void *to,
-					     const unsigned int len)
-{
-	memcpy(to, skb->data, len);
-}
-
-static inline void skb_copy_from_linear_data_offset(const struct sk_buff *skb,
-						    const int offset, void *to,
-						    const unsigned int len)
-{
-	memcpy(to, skb->data + offset, len);
-}
-
-static inline void skb_copy_to_linear_data(struct sk_buff *skb,
-					   const void *from,
-					   const unsigned int len)
-{
-	memcpy(skb->data, from, len);
-}
-
-static inline void skb_copy_to_linear_data_offset(struct sk_buff *skb,
-						  const int offset,
-						  const void *from,
-						  const unsigned int len)
-{
-	memcpy(skb->data + offset, from, len);
-}
 
 extern void skb_init(void);
 
-static inline ktime_t skb_get_ktime(const struct sk_buff *skb)
-{
-	return skb->tstamp;
-}
-
-/**
- *	skb_get_timestamp - get timestamp from a skb
- *	@skb: skb to get stamp from
- *	@stamp: pointer to struct timeval to store stamp in
- *
- *	Timestamps are stored in the skb as offsets to a base timestamp.
- *	This function converts the offset back to a struct timeval and stores
- *	it in stamp.
- */
-static inline void skb_get_timestamp(const struct sk_buff *skb,
-				     struct timeval *stamp)
-{
-	*stamp = ktime_to_timeval(skb->tstamp);
-}
-
-static inline void skb_get_timestampns(const struct sk_buff *skb,
-				       struct timespec *stamp)
-{
-	*stamp = ktime_to_timespec(skb->tstamp);
-}
-
-static inline void __net_timestamp(struct sk_buff *skb)
-{
-	skb->tstamp = ktime_get_real();
-}
-
-static inline ktime_t net_timedelta(ktime_t t)
-{
-	return ktime_sub(ktime_get_real(), t);
-}
-
-static inline ktime_t net_invalid_timestamp(void)
-{
-	return ktime_set(0, 0);
-}
-
-extern void skb_timestamping_init(void);
 
 #ifdef CONFIG_NETWORK_PHY_TIMESTAMPING
 
@@ -1935,116 +1467,16 @@ static inline void skb_clone_tx_timestamp(struct sk_buff *skb)
 
 static inline bool skb_defer_rx_timestamp(struct sk_buff *skb)
 {
-	return false;
+	return FALSE;
 }
 
 #endif /* !CONFIG_NETWORK_PHY_TIMESTAMPING */
-
-/**
- * skb_complete_tx_timestamp() - deliver cloned skb with tx timestamps
- *
- * PHY drivers may accept clones of transmitted packets for
- * timestamping via their phy_driver.txtstamp method. These drivers
- * must call this function to return the skb back to the stack, with
- * or without a timestamp.
- *
- * @skb: clone of the the original outgoing packet
- * @hwtstamps: hardware time stamps, may be NULL if not available
- *
- */
-void skb_complete_tx_timestamp(struct sk_buff *skb,
-			       struct skb_shared_hwtstamps *hwtstamps);
-
-/**
- * skb_tstamp_tx - queue clone of skb with send time stamps
- * @orig_skb:	the original outgoing packet
- * @hwtstamps:	hardware time stamps, may be NULL if not available
- *
- * If the skb has a socket associated, then this function clones the
- * skb (thus sharing the actual data and optional structures), stores
- * the optional hardware time stamping information (if non NULL) or
- * generates a software time stamp (otherwise), then queues the clone
- * to the error queue of the socket.  Errors are silently ignored.
- */
-extern void skb_tstamp_tx(struct sk_buff *orig_skb,
-			struct skb_shared_hwtstamps *hwtstamps);
-
-static inline void sw_tx_timestamp(struct sk_buff *skb)
-{
-	if (skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP &&
-	    !(skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS))
-		skb_tstamp_tx(skb, NULL);
-}
-
-/**
- * skb_tx_timestamp() - Driver hook for transmit timestamping
- *
- * Ethernet MAC Drivers should call this function in their hard_xmit()
- * function immediately before giving the sk_buff to the MAC hardware.
- *
- * @skb: A socket buffer.
- */
-static inline void skb_tx_timestamp(struct sk_buff *skb)
-{
-	skb_clone_tx_timestamp(skb);
-	sw_tx_timestamp(skb);
-}
-
-extern __sum16 __skb_checksum_complete_head(struct sk_buff *skb, int len);
-extern __sum16 __skb_checksum_complete(struct sk_buff *skb);
 
 static inline int skb_csum_unnecessary(const struct sk_buff *skb)
 {
 	return skb->ip_summed & CHECKSUM_UNNECESSARY;
 }
 
-/**
- *	skb_checksum_complete - Calculate checksum of an entire packet
- *	@skb: packet to process
- *
- *	This function calculates the checksum over the entire packet plus
- *	the value of skb->csum.  The latter can be used to supply the
- *	checksum of a pseudo header as used by TCP/UDP.  It returns the
- *	checksum.
- *
- *	For protocols that contain complete checksums such as ICMP/TCP/UDP,
- *	this function can be used to verify that checksum on received
- *	packets.  In that case the function should return zero if the
- *	checksum is correct.  In particular, this function will return zero
- *	if skb->ip_summed is CHECKSUM_UNNECESSARY which indicates that the
- *	hardware has already verified the correctness of the checksum.
- */
-static inline __sum16 skb_checksum_complete(struct sk_buff *skb)
-{
-	return skb_csum_unnecessary(skb) ?
-	       0 : __skb_checksum_complete(skb);
-}
-
-#if defined(CONFIG_NF_CONNTRACK) || defined(CONFIG_NF_CONNTRACK_MODULE)
-extern void nf_conntrack_destroy(struct nf_conntrack *nfct);
-static inline void nf_conntrack_put(struct nf_conntrack *nfct)
-{
-	if (nfct && atomic_dec_and_test(&nfct->use))
-		nf_conntrack_destroy(nfct);
-}
-static inline void nf_conntrack_get(struct nf_conntrack *nfct)
-{
-	if (nfct)
-		atomic_inc(&nfct->use);
-}
-#endif
-#ifdef NET_SKBUFF_NF_DEFRAG_NEEDED
-static inline void nf_conntrack_get_reasm(struct sk_buff *skb)
-{
-	if (skb)
-		atomic_inc(&skb->users);
-}
-static inline void nf_conntrack_put_reasm(struct sk_buff *skb)
-{
-	if (skb)
-		kfree_skb(skb);
-}
-#endif
 #ifdef CONFIG_BRIDGE_NETFILTER
 static inline void nf_bridge_put(struct nf_bridge_info *nf_bridge)
 {
@@ -2190,9 +1622,9 @@ static inline bool skb_warn_if_lro(const struct sk_buff *skb)
 	if (skb_is_nonlinear(skb) && shinfo->gso_size != 0 &&
 	    unlikely(shinfo->gso_type == 0)) {
 		__skb_warn_lro_forwarding(skb);
-		return true;
+		return TRUE;
 	}
-	return false;
+	return FALSE;
 }
 
 static inline void skb_forward_csum(struct sk_buff *skb)
@@ -2219,25 +1651,5 @@ static inline void skb_checksum_none_assert(const struct sk_buff *skb)
 
 bool skb_partial_csum_set(struct sk_buff *skb, u16 start, u16 off);
 
-static inline bool skb_is_recycleable(const struct sk_buff *skb, int skb_size)
-{
-	if (irqs_disabled())
-		return false;
-
-	if (skb_shinfo(skb)->tx_flags & SKBTX_DEV_ZEROCOPY)
-		return false;
-
-	if (skb_is_nonlinear(skb) || skb->fclone != SKB_FCLONE_UNAVAILABLE)
-		return false;
-
-	skb_size = SKB_DATA_ALIGN(skb_size + NET_SKB_PAD);
-	if (skb_end_pointer(skb) - skb->head < skb_size)
-		return false;
-
-	if (skb_shared(skb) || skb_cloned(skb))
-		return false;
-
-	return true;
-}
 #endif	/* __KERNEL__ */
 #endif	/* _LINUX_SKBUFF_H */

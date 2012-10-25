@@ -7,7 +7,7 @@ TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.def
 
-CFLAGS  += -D__KERNEL__
+CFLAGS  += -D__KERNEL__ -nostdinc
 LFLAGS  += -shared -fPIC -nostdinc
 
 LIB_TARGET := libltpmm.so
