@@ -34,8 +34,6 @@ typedef signed short   s16;
 typedef signed int     s32;
 
 
-typedef u8             bool;
-
 
 #ifndef TRUE
 #define TRUE    1

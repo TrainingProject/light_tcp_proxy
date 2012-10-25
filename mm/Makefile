@@ -10,8 +10,8 @@ include $(TOP_DIR)/Makefile.def
 CFLAGS  += -D__KERNEL__
 LFLAGS  += -shared -fPIC -nostdinc
 
-LIB_TARGET := libltpproxy.so
-OBJS       := ltp_ip.o 
+LIB_TARGET := libltpmm.so
+OBJS       := ltp_dummy_skbuff.o 
 
 
 ifeq ($(plat), linux)
