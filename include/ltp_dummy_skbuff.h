@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  ltp_dummy_skbuff.c
+ *       Filename:  ltp_dummy_skbuff.h
  *
- *    Description:  The skbuff memory management
+ *    Description:  
  *
  *        Version:  1.0
- *        Created:  10/25/2012 10:32:24 PM
+ *        Created:  10/28/2012 10:44:48 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,11 +15,10 @@
  *
  * =====================================================================================
  */
-#include "ltp_base_type.h"
-#include "linux/skbuff.h"
+#ifndef LTP_DUMMY_SKBUFF_H_
+#define LTP_DUMMY_SKBUFF_H_
 
-struct sk_buff * ltp_alloc_skbuff()
-{
-    
-}
+
+
+#endif
 
