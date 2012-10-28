@@ -7,8 +7,8 @@ TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.def
 
-CFLAGS  += -D__KERNEL__ -nostdinc
-LFLAGS  += -shared -fPIC -nostdinc
+CFLAGS  += -D__KERNEL__ 
+LFLAGS  += -shared -fPIC
 
 LIB_TARGET := libltpmm.so
 OBJS       := ltp_dummy_skbuff.o 

@@ -26,6 +26,7 @@
 
 #include "ltp_debug.h"
 #include "ltp_errno.h"
+#include "ltp_utils.h"
 
 #include "ltp_ip.h"
 /***************************************************************************************/

@@ -35,15 +35,26 @@ typedef signed short   s16;
 typedef signed int     s32;
 typedef long long      s64;
 
+typedef unsigned char      __u8;
+typedef unsigned short     __u16;
+typedef unsigned int       __u32;
+typedef unsigned long long __u64;
+
+
+typedef u8      bool;
 
 #ifndef TRUE
-#define TRUE    1
+#define TRUE    (1)
 #endif
 
 #ifndef FALSE
-#define FALSE   0
+#define FALSE   (0)
 #endif
 
+
+#ifndef NULL
+#define NULL    ((void*)0)
+#endif
 
 #ifdef __cplusplus
     }

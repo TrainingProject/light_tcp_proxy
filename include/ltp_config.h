@@ -32,21 +32,14 @@ OS type check
 	#error "Please config one OS!"
 #endif
 
-#ifdef LTP_LINUX
-#define likely(x)       __builtin_expect(!!(x),1)
-#define unlikely(x)     __builtin_expect(!!(x),0)
-#else
-#define likely(x)       (x)
-#define unlikely(y)     (y)
-#endif
-
-
-
 /*
 Debug switch
 */
 #define LTP_DEBUG_PRINT
 //#define LTP_DEBUG_SYSLOG
+
+
+#define __LITTLE_ENDIAN_BITFIELD
 
 
 /*************************************** Function Define ****************************************************/

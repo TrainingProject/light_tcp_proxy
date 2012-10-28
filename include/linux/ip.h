@@ -16,8 +16,9 @@
  */
 #ifndef _LINUX_IP_H
 #define _LINUX_IP_H
-#include <linux/types.h>
-#include <asm/byteorder.h>
+
+#include "ltp_config.h"
+#include "ltp_base_type.h"
 
 #define IPTOS_TOS_MASK		0x1E
 #define IPTOS_TOS(tos)		((tos)&IPTOS_TOS_MASK)
@@ -93,14 +94,14 @@ struct iphdr {
 #error	"Please fix <asm/byteorder.h>"
 #endif
 	__u8	tos;
-	__be16	tot_len;
-	__be16	id;
-	__be16	frag_off;
+	__u16	tot_len;
+	__u16	id;
+	__u16	frag_off;
 	__u8	ttl;
 	__u8	protocol;
-	__sum16	check;
-	__be32	saddr;
-	__be32	daddr;
+	__u16	check;
+	__u32	saddr;
+	__u32	daddr;
 	/*The options start here. */
 };
 
@@ -108,22 +109,22 @@ struct iphdr {
 struct ip_auth_hdr {
 	__u8  nexthdr;
 	__u8  hdrlen;		/* This one is measured in 32 bit units! */
-	__be16 reserved;
-	__be32 spi;
-	__be32 seq_no;		/* Sequence number */
+	__u16 reserved;
+	__u32 spi;
+	__u32 seq_no;		/* Sequence number */
 	__u8  auth_data[0];	/* Variable len but >=4. Mind the 64 bit alignment! */
 };
 
 struct ip_esp_hdr {
-	__be32 spi;
-	__be32 seq_no;		/* Sequence number */
+	__u32 spi;
+	__u32 seq_no;		/* Sequence number */
 	__u8  enc_data[0];	/* Variable len but >=8. Mind the 64 bit alignment! */
 };
 
 struct ip_comp_hdr {
 	__u8 nexthdr;
 	__u8 flags;
-	__be16 cpi;
+	__u16 cpi;
 };
 
 struct ip_beet_phdr {
