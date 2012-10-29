@@ -17,17 +17,17 @@ all:
 	@echo "plat=$(plat)" > Makefile.def
 	@echo "prefix=$(prefix)" >> Makefile.def
 	@cd mm && $(MAKE)
-	@cd proxy && $(MAKE)
+	@cd net && $(MAKE)
 	@cd main && $(MAKE)
 
 install:
 	@cd mm && $(MAKE) install
-	@cd proxy && $(MAKE) install
+	@cd net && $(MAKE) install
 	@cd main && $(MAKE) install
 
 clean:
 	@cd mm && $(MAKE) clean
-	@cd proxy && $(MAKE) clean
+	@cd net && $(MAKE) clean
 	@cd main && $(MAKE) clean
 	@cd bin && rm -f *
 	@cd lib && rm -f *

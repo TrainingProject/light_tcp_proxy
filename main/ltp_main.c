@@ -65,9 +65,8 @@ int main(int argc, const char ** argv)
             LTP_DEBUG_LOG("Get one packet\n");
             ipq_packet_msg_t *pkt = ipq_get_packet(buf);
             if (likely(pkt)) {
-                ret = ltp_ip_handler((struct iphdr *)pkt->payload);
             
-                ret = ipq_set_verdict(h, pkt->packet_id, NF_ACCEPT, pkt->data_len, pkt->payload);
+                ret = ipq_set_verdict(h, pkt->packet_id, NF_DROP, pkt->data_len, pkt->payload);
                 if (-1 == ret) {
                     LTP_ERROR_LOG("ipq_set_verdict failed\n");
                     goto error2;

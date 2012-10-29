@@ -10,7 +10,7 @@ include $(TOP_DIR)/Makefile.def
 CFLAGS  += -D__KERNEL__  
 LFLAGS  += -shared -fPIC
 
-LIB_TARGET := libltpproxy.so
+LIB_TARGET := libltpnet.so
 OBJS       := ltp_ip.o 
 
 

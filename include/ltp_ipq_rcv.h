@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  ltp_dummy_skbuff.c
+ *       Filename:  ltp_ipq_rcv.h
  *
- *    Description:  The skbuff memory management
+ *    Description:  The header file of receive routine 
  *
  *        Version:  1.0
- *        Created:  10/25/2012 10:32:24 PM
+ *        Created:  10/29/2012 10:29:40 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,7 +15,15 @@
  *
  * =====================================================================================
  */
-#include "ltp_base_type.h"
-#include "linux/skbuff.h"
 
+#ifndef LTP_IPQ_RCV_H_
+#define LTP_IPQ_RCV_H_
+
+
+extern int ltp_ipq_rcv(struct ipq_packet_msg *ipq_msg);
+
+
+
+
+#endif
 
