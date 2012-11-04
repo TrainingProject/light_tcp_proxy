@@ -39,7 +39,16 @@ Debug switch
 //#define LTP_DEBUG_SYSLOG
 
 
+#define LTP_LITTLE_ENDIAN
+//#define LTP_BIG_ENDIAN
+
+
+#ifdef LTP_LITTLE_ENDIAN
 #define __LITTLE_ENDIAN_BITFIELD
+#endif
+
+#ifdef LTP_BIG_ENDIAN
+#endif
 
 
 /*************************************** Function Define ****************************************************/

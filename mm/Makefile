@@ -11,7 +11,7 @@ CFLAGS  += -D__KERNEL__
 LFLAGS  += -shared -fPIC
 
 LIB_TARGET := libltpmm.so
-OBJS       := ltp_dummy_skbuff.o 
+OBJS       := ltp_dummy_skbuff.o ltp_mem.o
 
 
 ifeq ($(plat), linux)

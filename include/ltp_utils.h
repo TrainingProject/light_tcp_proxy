@@ -35,6 +35,20 @@
 #endif
 
 
+#ifdef LTP_LITTLE_ENDIAN
+#define ltp_ntohs(x)        ((((u16)(x) & (u16)0x00FFU) << 8) | \
+                             (((u16)(x) & (u16)0xFF00U) >> 8))
+#define ltp_ntohl(x)        ((((u32)(x) & (u32)0x000000FFU) << 24) | \
+                             (((u32)(x) & (u32)0x0000FF00U) << 8) | \
+                             (((u32)(x) & (u32)0x00FF0000U) >> 8) | \
+                             (((u32)(x) & (u32)0xFF000000U) >> 24))
+
+#define ltp_htons(x)        ltp_ntohs(x)
+#define ltp_htonl(x)        ltp_ntohl(x)
+
+
+#endif
+
 #ifdef __cplusplus
     }
 #endif

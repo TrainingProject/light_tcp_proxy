@@ -21,28 +21,23 @@
 #include <linux/ip.h>
 
 #include "ltp_debug.h"
+#include "ltp_errno.h"
 
-int ltp_ip_handler(struct iphdr *iph)
+/*
+ *  Deliver IP Packets to the higher protocol layers.
+ */
+int ip_local_deliver(struct sk_buff *skb)
 {
-    LTP_DEBUG_LOG("Receive one IPv4 packet\n");
+    /*
+     *  Reassemble IP fragments.
+     */
 
-    if (IPPROTO_TCP == iph->protocol) {
-        LTP_DEBUG_LOG("It is a TCP packet\n");
-        /* reverse ip & port */
-        u32 addr = iph->saddr;
-        addr = ntohl(addr);
-        addr -= 1;
-        addr = htonl(addr);
-        iph->saddr = addr;
-        
-        //iph->saddr = iph->daddr;
-        //iph->daddr = addr;
-
-        
+    if (ip_is_fragment(ip_hdr(skb))) {
+        LTP_INFO_LOG("Ihe IP packet is fragmented\n");
+        //if (ip_defrag(skb, IP_DEFRAG_LOCAL_DELIVER))
+            return 0;
     }
-    
-    
 
-    return 0;
+    return LTP_OK;
 }
 

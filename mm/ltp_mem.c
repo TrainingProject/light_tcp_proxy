@@ -1,26 +1,32 @@
 /*
  * =====================================================================================
  *
- *       Filename:  ltp_dummy_skbuff.h
+ *       Filename:  ltp_mem.c
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  10/28/2012 10:44:48 PM
+ *        Created:  10/31/2012 10:09:24 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Feng Gao
+ *         Author:  Bin Lee
+ *                  Feng Gao
  *          Email:  gfree.wind@gmail.com  
  *
  * =====================================================================================
  */
-#ifndef LTP_DUMMY_SKBUFF_H_
-#define LTP_DUMMY_SKBUFF_H_
+#include <stdlib.h>
 
-extern struct sk_buff *ltp_alloc_skbuff(u32 size);
-extern void ltp_free_skbuff(struct sk_buff* skb);
+#include "ltp_base_type.h"
 
+void *ltp_alloc_mem(u32 size)
+{
+    return malloc(size);
+}
 
-#endif
+void ltp_free_mem(void *ptr)
+{
+    free(ptr);
+}
 

@@ -20,7 +20,7 @@
 #define LTP_IPQ_RCV_H_
 
 
-extern int ltp_ipq_rcv(struct ipq_packet_msg *ipq_msg);
+extern int ltp_ipq_rcv(const struct ipq_packet_msg *ipq_msg);
 
 
 

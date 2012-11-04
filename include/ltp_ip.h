@@ -20,8 +20,7 @@
 
 #include <linux/ip.h>
 
-extern int ltp_ip_handler(struct iphdr *iph);
-
+extern int ip_local_deliver(struct sk_buff *skb);
 
 #endif
 

@@ -19,6 +19,7 @@
 
 #include "ltp_config.h"
 #include "ltp_base_type.h"
+#include "ltp_utils.h"
 
 #define IPTOS_TOS_MASK		0x1E
 #define IPTOS_TOS(tos)		((tos)&IPTOS_TOS_MASK)
@@ -133,5 +134,31 @@ struct ip_beet_phdr {
 	__u8 padlen;
 	__u8 reserved;
 };
+
+
+#include <linux/skbuff.h>
+
+static inline struct iphdr *ip_hdr(const struct sk_buff *skb)
+{
+    return (struct iphdr *)skb_network_header(skb);
+}
+
+static inline struct iphdr *ipip_hdr(const struct sk_buff *skb)
+{
+    return (struct iphdr *)skb_transport_header(skb);
+}
+
+
+/* IP flags. */
+#define IP_CE       0x8000      /* Flag: "Congestion"       */
+#define IP_DF       0x4000      /* Flag: "Don't Fragment"   */
+#define IP_MF       0x2000      /* Flag: "More Fragments"   */
+#define IP_OFFSET   0x1FFF      /* "Fragment Offset" part   */
+
+static inline bool ip_is_fragment(const struct iphdr *iph)
+{
+    return (iph->frag_off & ltp_htons(IP_MF | IP_OFFSET)) != 0;
+}
+
 
 #endif	/* _LINUX_IP_H */

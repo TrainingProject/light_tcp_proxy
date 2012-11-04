@@ -28,7 +28,8 @@
 #include "ltp_errno.h"
 #include "ltp_utils.h"
 
-#include "ltp_ip.h"
+#include "ltp_ipq_rcv.h"
+
 /***************************************************************************************/
 static bool g_ltp_daemon_exit = FALSE;
 /***************************************************************************************/
@@ -66,6 +67,11 @@ int main(int argc, const char ** argv)
             ipq_packet_msg_t *pkt = ipq_get_packet(buf);
             if (likely(pkt)) {
             
+                if (LTP_OK != ltp_ipq_rcv(pkt)) {
+                    // Need not the error handler
+                    LTP_ERROR_LOG("ltp_ipq_rcv failed\n");
+                }
+                
                 ret = ipq_set_verdict(h, pkt->packet_id, NF_DROP, pkt->data_len, pkt->payload);
                 if (-1 == ret) {
                     LTP_ERROR_LOG("ipq_set_verdict failed\n");

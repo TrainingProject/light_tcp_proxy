@@ -11,7 +11,7 @@ CFLAGS  += -D__KERNEL__
 LFLAGS  += -shared -fPIC
 
 LIB_TARGET := libltpnet.so
-OBJS       := ltp_ip.o 
+OBJS       := ltp_ip.o
 
 
 ifeq ($(plat), linux)
